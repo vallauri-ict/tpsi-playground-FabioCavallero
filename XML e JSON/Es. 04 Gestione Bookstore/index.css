@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+*{
+    padding: 0;
+    margin: 0;
+    font-family: "Open Sans", "Arial", "Verdana", sans-serif;
+}
+body{
+    background-color: lavender;
+}
+h1{
+    text-align: center;
+    margin: 10px;
+    font-size: 30pt;
+}
+table{
+    margin: 0 auto;
+    width: fit-content;
+    border: 1px solid black;     
+    background-color: white;
+}
+th, td{
+    border: 1px solid black;
+    padding: 5px 10px;
+    font-size: 15pt;
+}
+th{
+    color: red;
+}
+.details{
+    background-color: white;
+    display: grid;
+    width: 400px;
+    grid-template-columns: 140px auto;
+    grid-template-rows: 40px 40px 40px 40px 40px 40px;
+	grid-column-gap: 5px;
+    grid-row-gap: 5px;
+    margin: 10px auto;
+    border: 1px solid black;
+}
+/* perogni tag che si trova all'interno del contenitore che implementa */
+/* la classe details, si assegna un altezza alla riga di 40 pixel */
+.details > *{
+    line-height: 40px;
+    overflow: auto;
+}
+.navigationButtonsContainer{
+    margin: 10px auto;
+    width: 400px;
+    text-align: center;
+}
+.navigationButtons{
+    padding: 5px 10px;
+    width: 100px;
+    margin: 5px 0;
+}
+.navigationButtons:nth-of-type(6){
+    width: 200px;
+}
