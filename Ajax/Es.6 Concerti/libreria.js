@@ -1,5 +1,4 @@
 "use strict";
-
 function inviaRichiesta(method, url, parameters={}) {
 	let contentType;
 	if(method.toUpperCase()=="GET")
@@ -17,8 +16,6 @@ function inviaRichiesta(method, url, parameters={}) {
         "timeout": 5000,      // default 
     });	
 }
-
-
 function errore(jqXHR, text_status, string_error) {
     if (jqXHR.status == 0)
         alert("Connection Refused or Server timeout");
@@ -27,7 +24,6 @@ function errore(jqXHR, text_status, string_error) {
     else
         alert("Server Error: " + jqXHR.status + " - " + jqXHR.responseText);
 }
-
 function generaNumero(a, b){
 	return Math.floor((b-a+1)*Math.random()) + a;
 }

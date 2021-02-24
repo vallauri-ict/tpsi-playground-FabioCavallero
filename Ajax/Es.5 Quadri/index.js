@@ -1,172 +1,145 @@
-"use strict"
+"option strict"
 
 const URL = "http://localhost:3000"
 
-$(function() {
+$(function () {
     let _head = $('.head');
     let _info = $('.info');
     let _img = $('.img');
     let _btnPrev = $('button').eq(0);
     let _btnNext = $('button').eq(1);
+    _btnPrev.prop("disabled", true);
+    let posizioneQuadro = 0;
+    let elencoQuadri;
+    let genereQuadri;
+	
     let _wrapperAdd = $('.wrapper').eq(1);
+    
+    let request = inviaRichiesta("GET", URL + "/artisti");
+    request.fail(errore);
+    request.done(function(artisti){
+        for (const artista of artisti) {
+            let lbl = $("<label>");
+            lbl.appendTo(_head);
+            let rdb = $("<input type='radio'>");
+            rdb.prop("type","radio");
+            rdb.prop("artista",artista);
+            rdb.prop("name","artisti");
+            rdb.appendTo(lbl);
+            lbl.append(artista.name);
+        }
+        let pos = generaNumero(0,artisti.length-1);
+        let chk = $("input[type=radio]").eq(pos).prop("checked",true);
+        _wrapperAdd.children("h1").text("Inserisci un nuovo quadro di " +  chk.prop("artista").name);
+        let idArtista = chk.prop("artista").id;
+        genereQuadri = chk.prop("artista").gender;
+        inviaRichiestaQuadri(idArtista);
+    })
 
-
-    let quadroCorrente = 0;
-
-    _btnPrev.prop("disabled", true)
-
-    crea();
-
-    // -----------------------------------------------
-
-    function crea() {
-        let request = inviaRichiesta("get", URL + "/artisti");
-        let n = 1;
-
+    function inviaRichiestaQuadri(idArtista)
+    {
+        let request = inviaRichiesta("GET",URL + "/quadri?artist=" + idArtista);
         request.fail(errore);
-        request.done(function(artisti) {
-            for (const artista of artisti) {
-                let radio = $("<input>");
-                radio.prop("type", "radio");
-                radio.prop("name", "artistaName");
-                radio.prop("numArt", n++);
-                radio.prop("gender", artista.gender);
-                radio.on("click", aggiornaQuadri)
-                radio.appendTo(_head);
-
-                let label = $("<label>");
-                label.text(artista.name);
-                label.appendTo(_head);
-            }
-            let artCheked = generaNumero(0, 5);
-            _head.find("input[type=radio]").eq(artCheked).prop("checked", true);
-            quadriInizali(artCheked);
+        request.done(function(quadri){
+            elencoQuadri = quadri;
+            visualizzaQuadro(elencoQuadri[0]);
         })
     }
 
-    function quadriInizali(numArt) {
-        numArt++;
-        let request = inviaRichiesta("get", URL + "/quadri?artist=" + numArt);
+    _head.on("click","input",function(){
+        posizioneQuadro = 0;
+        _btnNext.prop("disabled",false);
+        _btnPrev.prop("disabled",true);
+        let idArtista = $(this).prop("artista").id;
+        genereQuadri =  $(this).prop("artista").gender;
+        _wrapperAdd.children("h1").text("Inserisci un nuovo quadro di " +  $(this).prop("artista").name);
+        inviaRichiestaQuadri(idArtista);
+    })
 
-        request.fail(errore);
-        request.done(function(quadriArtista) {
-            console.log(quadriArtista);
+    _btnPrev.on("click",function(){
+        if(posizioneQuadro==0)
+        {
+            $(this).prop("disabled",true);
+        }
+        else
+        {
+            posizioneQuadro--;
+            _btnNext.prop("disabled",false);
+        }
+        visualizzaQuadro(elencoQuadri[posizioneQuadro]);
+    })
 
-            let pId = $("<p>")
-            pId.text("ID: " + quadriArtista[quadroCorrente].id);
-            pId.appendTo(_info);
+    _btnNext.on("click",function(){
+        _btnPrev.prop("disabled",false);
+        posizioneQuadro++;
+        if(posizioneQuadro == elencoQuadri.length-1)
+        {
+            $(this).prop("disabled",true);
+        }
+        visualizzaQuadro(elencoQuadri[posizioneQuadro]);
+    })
 
-            let pTitolo = $("<p>")
-            pTitolo.text("Titolo: " + quadriArtista[0].title);
-            pTitolo.appendTo(_info);
-
-            let pGenere = $("<p>")
-            pGenere.text("Genere: " + _head.find("input[type=radio]:checked").prop("gender"));
-            pGenere.appendTo(_info);
-
-            let pLike = $("<p>")
-            pLike.text("Like: " + quadriArtista[0].nLike);
-            pLike.appendTo(_info);
-
-            let imgLike = $("<img>");
-            imgLike.prop("src", "like.jpg");
-            imgLike.prop("numLike", quadriArtista[0].nLike);
-            imgLike.addClass("like");
-            imgLike.on("click", aggiornaLike);
-            imgLike.appendTo(_info);
-
-            let imgQuadro = $("<img>");
-            imgQuadro.prop("src", "img/" + quadriArtista[0].img);
-            imgQuadro.appendTo(_img);
-
-            wrapper2();
-        })
-    }
-
-    function aggiornaQuadri() {
+    function visualizzaQuadro(quadro)
+    {
         _info.empty();
         _img.empty();
-
-        let request = inviaRichiesta("get", URL + "/quadri?artist=" + _head.find("input[type=radio]:checked").prop("numArt"));
-
-        request.fail(errore);
-        request.done(function(quadriArtista) {
-            console.log(quadriArtista);
-
-            let pId = $("<p>")
-            pId.text("ID: " + quadriArtista[quadroCorrente].id);
-            pId.appendTo(_info);
-
-            let pTitolo = $("<p>")
-            pTitolo.text("Titolo: " + quadriArtista[quadroCorrente].title);
-            pTitolo.appendTo(_info);
-
-            let pGenere = $("<p>")
-            pGenere.text("Genere: " + _head.find("input[type=radio]:checked").prop("gender"));
-            pGenere.appendTo(_info);
-
-            let pLike = $("<p>")
-            pLike.text("Like: " + quadriArtista[quadroCorrente].nLike);
-            pLike.appendTo(_info);
-
-            let imgLike = $("<img>");
-            imgLike.prop("src", "like.jpg");
-            imgLike.prop("numLike", quadriArtista[0].nLike);
-            imgLike.addClass("like");
-            imgLike.on("click", aggiornaLike);
-            imgLike.appendTo(_info);
-
-            let imgQuadro = $("<img>");
-            imgQuadro.prop("src", "img/" + quadriArtista[quadroCorrente].img);
-            imgQuadro.appendTo(_img);
-
-            wrapper2();
-        })
-    }
-
-    _btnPrev.on("click", function() {
-        quadroCorrente--;
-
-        if (quadroCorrente == 0) {
-            _btnPrev.prop("disabled", true);
-        }
-        if (_btnNext.prop("disabled") == true) {
-            _btnNext.prop("disabled", false);
-        }
-
-        aggiornaQuadri()
-    });
-
-    _btnNext.on("click", function() {
-        quadroCorrente++;
-
-        if (_head.find("input[type=radio]:checked").text() == "Picasso") {
-            if (quadroCorrente == 3) {
-                _btnNext.prop("disabled", true);
+        $("<p>").text("ID = " + quadro.id).appendTo(_info);
+        $("<p>").text("Titolo = " + quadro.title).appendTo(_info);
+        $("<p>").text("Genere = " + genereQuadri).appendTo(_info);
+        let p = $("<p>").text("Like = " + quadro.nLike).appendTo(_info);
+        let img = $("<img>").prop("src","like.jpg").addClass("like").appendTo(p);
+        img.on("click",function(){
+            let request = inviaRichiesta("PATCH",URL + "/quadri/" + quadro.id,
+            {
+                "nLike":quadro.nLike+1,
             }
-        } else {
-            if (quadroCorrente == 2) {
-                _btnNext.prop("disabled", true);
+            );
+            request.fail(errore);
+            request.done(function(data){
+                visualizzaQuadro(data[0]);
+                elencoQuadri = data;
+            })
+        })
+        if(!quadro.img.includes("base64"))
+        {
+            $("<img>").prop("src","img/" + quadro.img).appendTo(_img);
+        }
+        else
+            $("<img>").prop("src",quadro.img).appendTo(_img);
+       
+    }
+    
+    /* *********************************** */
+    let _txtImg = $("#immagine");
+    let _txtTitle = $("#titolo");
+
+    $("#btnSalva").on("click",function(){
+        if(_txtTitle.val() == ""  || _txtImg.prop("files") == "")
+        {
+            alert("Inserire titolo e immagine");
+        }
+        else
+        {
+            let fileName = _txtImg.prop("files")[0];
+            let reader = new FileReader();
+            reader.readAsDataURL(fileName);
+            reader.onloadend = function() {
+                console.log('RESULT', reader.result);
+                let idArtista = $("input[type='radio']:checked").prop("artista").id;
+                let json = {
+                    "artist": idArtista,
+                    "title": _txtTitle.val(),
+                    "img": reader.result,
+                    "nLike": 0
+                }
+                let request = inviaRichiesta("POST",URL + "/quadri",json);
+                request.fail(errore);
+                request.done(function(data){
+                    console.log(data);
+                    alert("Quadro inserito correttamente");
+                    inviaRichiestaQuadri(idArtista);
+                })
             }
         }
-        if (_btnPrev.prop("disabled") == true) {
-            _btnPrev.prop("disabled", false);
-        }
-
-        aggiornaQuadri()
-    });
-
-    function aggiornaLike() {
-        let url = URL + "/quadri/" + parseInt(_info.children().eq(0).text().split(" ")[1]);
-        let request = inviaRichiesta("patch", url, { "nLike": parseInt(_info.children().eq(3).text().split(" ")[1]) + 1 });
-
-        request.fail(errore);
-        request.done(function() {
-            _head.find("input[type=radio]:checked").trigger("click");
-        })
-    }
-
-    function wrapper2() {
-        _wrapperAdd.children("h1").text("Inserisci un nuovo quadro di " + _head.find("input[type=radio]:checked").next().text());
-    }
+    })
 })
