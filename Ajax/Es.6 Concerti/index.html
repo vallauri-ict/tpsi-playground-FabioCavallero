@@ -16,19 +16,25 @@
  <div class="container">
     <h1 style="text-align: center">CONCERTI 2018</h1>
     <div class="row">
-		<div style="display: inline-block" class="dropdown">
-			<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Genere
-			<span class="caret"></span></button>
-			<ul id="lstCitta" class="dropdown-menu">
-			</ul>
-		  </div>
-		  <div style="display: inline-block" class="dropdown">
+		
+		<div style="display:inline-block" class="dropdown">
 			<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Città
-			<span class="caret"></span></button>
-			<ul id="lstCGeneri" class="dropdown-menu">
+				<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu" id="lstCitta">
 			</ul>
 		  </div>
+		
+		  <div style="display:inline-block" class="dropdown">
+			<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Genere
+				<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu" id="lstGeneri">
+			</ul>
+		  </div>
+       
 	   <button  id="btnFiltro" class="btn btn-warning"> FILTRA </button>
+		
 		<table class="table table-hover" style="margin-top:20px">
 			<thead>
 				<tr>
@@ -43,14 +49,18 @@
 					<th>prenota</th>
 				</tr>
 			</thead>
+			
 			<tbody>	
+			
 			</tbody>
 		</table>
+		
 		<div class="form-group" id="divDettagli">
 			<label for="comment">Dettagli:</label>
 			<textarea class="form-control" rows="6"></textarea>
 		</div>
     </div>
  </div>
+ 
 </body>
 </html>

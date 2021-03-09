@@ -1,4 +1,5 @@
 "use strict";
+
 const URL = "http://localhost:3000"
 
 function inviaRichiesta(method, url, parameters={}) {
@@ -9,7 +10,6 @@ function inviaRichiesta(method, url, parameters={}) {
 		contentType = "application/json; charset=utf-8"
         parameters = JSON.stringify(parameters);
 	}
-    // $.ajax restituisce una promise che si mette in ascolto della risposta di $.ajax 
     return $.ajax({
         "url": URL + url,
 		"data": parameters,
