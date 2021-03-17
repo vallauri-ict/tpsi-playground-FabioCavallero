@@ -1,126 +1,148 @@
-"use strict"
+"use strict";
 
 $(document).ready(function () {
+  let _login = $("#login");
+  let _test = $("#test");
 
-    let _login = $("#login")
-    let _test = $("#test")
-   
-    let _txtUsr = $("#usr")
-    let _txtPwd = $("#pwd")
-    let _btnLogin = $("#btnLogin")
-    let _lblErrore = $("#lblErrore")
-	
-	let _domande = $(".domande")
-	
-	/* ******************************* */
+  let _txtUsr = $("#usr");
+  let _txtPwd = $("#pwd");
+  let _btnLogin = $("#btnLogin");
+  let _lblErrore = $("#lblErrore");
 
-    _login.show()
-    _test.hide()
-    _lblErrore.hide()
-    let idStudente;
-   
-    _btnLogin.on("click", function(){
-       let user = _txtUsr.val();
-       let pwd = _txtPwd.val();
-       let json = {
-           "user":user,
-           "pwd":pwd
-       }
-       // uguale a quella sotto: let request = inviaRichiesta("get",`/studenti?user=${user}&pwd=${pwd}`); 
-       let request = inviaRichiesta("get","/studenti",json); // più strutturata
-       request.fail(errore);
-       request.done(function(data){
-           // data è un vettore che può essere lungo 1 se log in ok oppure 0 se login non è ok
-           console.log(data);
-           if(data.length == 0)
-                _lblErrore.fadeIn(600);
-            else
-            {
-                _login.hide();
-                _test.show();
-                idStudente = data[0].id;
-                InviaRichiestaDomande();
-            }
-       })
-    })
+  let idStudente;
 
-    _lblErrore.children("button").on("click", function(){
-		_lblErrore.fadeOut(600)
-	})
-	/* ***************************************** */
-    function InviaRichiestaDomande(){
-        let request = inviaRichiesta("get","/domande");
-        request.fail(errore);
-        request.done(function(domande){
-            for (const domanda of domande) {
-                let br = $("<br>");
-                br.appendTo(_test.children().eq(2));
+  let _domande = $(".domande");
 
-                let div = $("<div>");
-                div.appendTo(_test.children().eq(2));
+  /* ******************************* */
 
-                let p = $("<p>");
-                p.addClass("domanda");
-                p.text(domanda.domanda);
-                p.prop("id",domanda.id);
-                //p.appendTo(_domande);
-                p.appendTo(div);
+  _login.show();
+  _test.hide();
+  _lblErrore.hide();
 
-                let requestRisposte = inviaRichiesta("get","/risposte?codDomanda=" + domanda.id);
-                requestRisposte.fail(errore);
-                requestRisposte.done(function(risposte){
-                    for (const risposta of risposte) {
-                        let opt = $("<input type=radio>");
-                        opt.prop("risposta",risposta);
-                        opt.prop("name",domanda.id);
-                        opt.appendTo(div);
+  _btnLogin.on("click", function () {
+    let user = _txtUsr.val();
+    let pwd = _txtPwd.val();
+    let json = {
+      user: user,
+      pwd: pwd,
+    };
+    // let request = inviaRichiesta("get", `/studenti?user=${pwd}&pwd=${pwd}`);
+    let request = inviaRichiesta("get", "/studenti", json);
+    request.fail(errore);
+    request.done(function (data) {
+      // data, dato che non abbiamo filtrato per id, è un
+      // vettore enumerativo anche se è lungo 1
+      console.log(data);
+      if (data.length > 0) {
+        _login.hide();
+        _test.show();
+        idStudente = data[0].id;
+        inviaRichiestaDomande();
+      } else {
+        _lblErrore.fadeIn(600);
+      }
+    });
+  });
 
-                        let span = $("<span>");
-                        span.text(" " + risposta.risposta);
-                        span.appendTo(div);
-                        let br = $("<br>");
-                        br.appendTo(div);
-                    }
-                    let opt = $("<input type=radio>");
-                    opt.prop("risposta",{"correct":false});
-                    opt.prop("name",domanda.id);
-                    opt.prop("checked",true);
-                    opt.appendTo(div);
+  _lblErrore.children("button").on("click", function () {
+    _lblErrore.fadeOut(600);
+  });
 
-                    let span = $("<span>");
-                    span.text(" Non rispondo");
-                    span.appendTo(div);
+  function inviaRichiestaDomande() {
+    let request = inviaRichiesta("get", "/domande");
+    request.fail(errore);
+    request.done(function (domande) {
+      for (const domanda of domande) {
+        // con var avrebbe preso solamente l'ultimo div
+        // avrebbe caricato tutte le risposte all'ultima domanda
+        // è come se let si memorizzasse il div corrente e
+        // che venga poi aggiunto tutto a quel div preciso
+        let div = $("<div>");
+        _test.children().eq(2).append(div);
 
-                    let br = $("<br>");
-                    br.appendTo(div);
-                })
-            }
-            let button = $("<button>");
-            button.appendTo(_test.children().eq(2));
-            button.text("INVIA");
-            button.on("click",function(){
-                let _opts = $("input[type=radio]:checked");
-                let voto = 0;
-                // for (const opt of _opts) {
-                //     if($(opt).prop("risposta").correct == true)
-                //         voto++;
-                //     else
-                //         $(opt).next().css("color","red");
-                // }
-                _opts.each(function(i,ref){
-                    if($(this).prop("risposta").correct == true)
-                        voto++;
-                    else
-                        $(ref).next().css({"color":"red"});
-                })
-                let request = inviaRichiesta("patch","/studenti/" + idStudente, {"voto":voto});
-                request.fail(errore);
-                request.done(function(data){
-                    console.log(data);
-                    alert("Complimenti hai preso un bel " + voto);
-                })
-            })
-        })   
-    }
+        let p = $("<p>");
+        p.addClass("domanda");
+        p.text(domanda.domanda);
+        p.prop("id", domanda.id);
+        div.append(p);
 
+        let richiestaRisposte = inviaRichiesta(
+          "get",
+          `/risposte?codDomanda=${domanda.id}`
+        );
+        richiestaRisposte.fail(errore);
+        richiestaRisposte.done(function (risposte) {
+          for (const risposta of risposte) {
+            let radio = $("<input type='radio'>");
+            div.append(radio);
+            radio.prop("name", domanda.id);
+            radio.prop("risposta", risposta);
+
+            let span = $("<span>");
+            span.appendTo(div);
+            span.text(" " + risposta.risposta);
+
+            let br = $("<br>");
+            br.appendTo(div);
+          }
+          let radio = $("<input type='radio'>");
+          div.append(radio);
+          radio.prop("name", domanda.id);
+          radio.prop("risposta", {"correct": false});
+          radio.prop("checked", true);
+
+          let span = $("<span>");
+          span.appendTo(div);
+          span.text(" Non rispondo");
+
+          let br = $("<br>");
+          br.appendTo(div);
+        });
+      }
+      let btn = $("<button>");
+      btn.appendTo(_test.children().eq(2));
+      btn.text("Invia");
+      btn.on("click", function () {
+        // una collezione jQuery è costituita da puntatori JS
+        // quindi nella if farò il puntatore JS castato con $ 
+        // per jQuery ***************************************
+        let radios = $("input[type=radio]:checked");
+        let voto = 0;
+
+        /*for (let i = 0; i < radios.length; i++) {
+          if (radios.eq(i).prop("risposta").correct) {
+            voto++;
+          } else {
+            radios.eq(i).next().css({"color": "red"});
+          }
+        }*/
+
+        /*for (const radio of radios) {
+          if($(radio).prop("risposta").correct) {
+            voto ++;
+          } else {
+            $(radio).next().css({"color": "red"});
+          }
+        }*/
+
+        radios.each(function(i, ref){
+          if($(this).prop("risposta").correct) {
+            voto++;
+          } else {
+            $(ref).next().css({"color": "red"});
+          }
+        })
+
+
+        let req = inviaRichiesta("patch", "/studenti/" + idStudente, {"voto": voto});
+        req.fail(errore);
+        req.done(function(data) {
+          console.log(data);
+          alert("Complimenti hai preso un bel " + voto);
+          
+          
+        });
+      });
+    });
+  }
 });
