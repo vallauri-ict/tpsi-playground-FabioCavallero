@@ -2,10 +2,10 @@
 
 _Stud. Fabio Cavallero_
 
-## Esercizi di TPSI con programmazione in:
+###### Esercizi di TPSI con programmazione in:
 
 jQuery, Ajax, Javascript, Geolocation, HTML, CSS3 e PHP.
 
-## Progetti: 
+###### Progetti: 
 
 RandomUser & AlphaVantage(vedi omonime repository).
