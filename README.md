@@ -2,7 +2,7 @@
 
 _Stud. Fabio Cavallero_
 
-###### Esercizi di TPSI svolti in classe o a casa come compito con programmazione in:
+###### Esercizi di TPSI svolti in classe con programmazione in:
 
 jQuery, Ajax, Javascript, Geolocation, HTML, CSS3 e PHP.
 
