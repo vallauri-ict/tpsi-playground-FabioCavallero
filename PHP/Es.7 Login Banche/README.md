@@ -1,6 +1,8 @@
-7. > **LEZIONE 7**
-     7. > *Consegna PHP - Ese 7 Login Banche*
+# tpsi-playground-fabio-cavallero
 
+_Stud. Fabio Cavallero_
+
+###### Es.7 Login banche
 ## Obiettivo:
 Realizzare una pagina **login.php** in cui un correntista inserisce il proprio nome e password.
 
