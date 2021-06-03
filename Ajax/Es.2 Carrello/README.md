@@ -2,4 +2,5 @@
 
 _Stud. Fabio Cavallero_
 
-##Carrello
+### Carrello
+Esercizio inerente la vendita di fotocamere.
