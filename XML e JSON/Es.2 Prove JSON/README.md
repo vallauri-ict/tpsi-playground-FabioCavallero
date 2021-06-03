@@ -2,4 +2,5 @@
 
 _Stud. Fabio Cavallero_
 
-##Prove JSON
+### Prove JSON
+Sono state eseguite diverse prove sui vettori associativi e gli oggetti. 
